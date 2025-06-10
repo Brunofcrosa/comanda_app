@@ -4,7 +4,6 @@ import 'package:flutter_comandas_app/modelos/usuario.dart';
 import 'package:flutter_comandas_app/utilitarios/utils.dart';
 import 'package:flutter_comandas_app/pages/login/cadastro.dart';
 import 'package:flutter_comandas_app/pages/home/homepage.dart';
-import 'package:flutter_comandas_app/main.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -99,7 +98,6 @@ class _LoginPageState extends State<LoginPage> {
                   keyboardType: TextInputType.emailAddress,
                   decoration: const InputDecoration(
                     labelText: 'E-mail',
-                    hintText: 'seuemail@exemplo.com',
                     prefixIcon: Icon(Icons.email),
                   ),
                   validator: (value) {

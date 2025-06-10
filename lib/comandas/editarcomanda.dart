@@ -91,7 +91,7 @@ class _EditarComandaPageState extends State<EditarComandaPage> {
       if (mounted) {
         showSnackBarMessage(
           context,
-          'Item adicionado temporariamente. Salve a comanda para persistir.',
+          'Item adicionado temporariamente. Precisa Salvar!!!',
         );
       }
     }
@@ -104,7 +104,7 @@ class _EditarComandaPageState extends State<EditarComandaPage> {
     if (mounted) {
       showSnackBarMessage(
         context,
-        'Item removido temporariamente. Salve a comanda para persistir.',
+        'Item removido temporariamente. Precisa Salvar!!!',
       );
     }
   }
@@ -186,7 +186,7 @@ class _EditarComandaPageState extends State<EditarComandaPage> {
     ).format(_editingComanda.total);
 
     return Scaffold(
-      backgroundColor: ComandasApp.tertiaryGreyColor,
+      backgroundColor: Color(0xFFFFFFFF),
       appBar: AppBar(
         title: Text('Comanda: ${_editingComanda.nome}'),
         actions: [
@@ -196,7 +196,7 @@ class _EditarComandaPageState extends State<EditarComandaPage> {
             tooltip: 'Editar Nome da Comanda',
           ),
           IconButton(
-            icon: const Icon(Icons.save),
+            icon: const Icon(Icons.done),
             onPressed: _isLoading ? null : _saveComandaChanges,
             tooltip: _isLoading ? 'Salvando...' : 'Salvar Alterações',
           ),
@@ -228,7 +228,7 @@ class _EditarComandaPageState extends State<EditarComandaPage> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Icon(
-                                Icons.fastfood,
+                                Icons.local_dining,
                                 size: constraints.maxWidth > 600 ? 100 : 80,
                                 color: ComandasApp.tertiaryGreyColor
                                     .withOpacity(0.8),

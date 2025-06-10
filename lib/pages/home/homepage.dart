@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_comandas_app/pages/comanda/comanda.dart';
 import 'package:flutter_comandas_app/comandas/comprovantes.dart';
-import 'package:flutter_comandas_app/main.dart';
 
 class MainAppNavigator extends StatefulWidget {
   const MainAppNavigator({super.key});

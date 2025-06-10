@@ -38,7 +38,7 @@ class ComandaItemCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               _buildItemImage(context, item.caminhoFoto),
-              const SizedBox(width: 16),
+              const SizedBox(width: 10),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -48,17 +48,17 @@ class ComandaItemCard extends StatelessWidget {
                       item.nome,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 18,
+                        fontSize: 20,
                         color: Theme.of(context).textTheme.bodyLarge?.color,
                       ),
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 18),
                     Text(
                       'Qtd: ${item.quantidade} | Preço Unit.: $precoUnitarioFormatado',
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 10,
                         color: Theme.of(context).textTheme.bodySmall?.color,
                       ),
                       overflow: TextOverflow.ellipsis,
@@ -73,12 +73,12 @@ class ComandaItemCard extends StatelessWidget {
                   Text(
                     totalItemFormatado,
                     style: TextStyle(
-                      fontSize: 20,
+                      fontSize: 15,
                       fontWeight: FontWeight.bold,
                       color: ComandasApp.successColor,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 24),
                   SizedBox(
                     height: 36,
                     width: 36,

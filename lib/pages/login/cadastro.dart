@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_comandas_app/modelos/usuario.dart';
 import 'package:flutter_comandas_app/servicos/database/banco_dados.dart';
 import 'package:flutter_comandas_app/utilitarios/utils.dart';
-import 'package:flutter_comandas_app/main.dart';
 
 class SignUpForm extends StatefulWidget {
   const SignUpForm({super.key});
@@ -104,7 +103,6 @@ class _SignUpFormState extends State<SignUpForm> {
                   keyboardType: TextInputType.name,
                   decoration: const InputDecoration(
                     labelText: 'Nome Completo',
-                    hintText: 'Seu nome e sobrenome',
                     prefixIcon: Icon(Icons.person),
                   ),
                   validator: (value) {
@@ -120,7 +118,6 @@ class _SignUpFormState extends State<SignUpForm> {
                   keyboardType: TextInputType.emailAddress,
                   decoration: const InputDecoration(
                     labelText: 'E-mail',
-                    hintText: 'seuemail@exemplo.com',
                     prefixIcon: Icon(Icons.email),
                   ),
                   validator: (value) {
@@ -142,7 +139,6 @@ class _SignUpFormState extends State<SignUpForm> {
                   obscureText: _obscurePassword,
                   decoration: InputDecoration(
                     labelText: 'Senha',
-                    hintText: '******',
                     prefixIcon: const Icon(Icons.lock),
                     suffixIcon: IconButton(
                       icon: Icon(
@@ -173,7 +169,6 @@ class _SignUpFormState extends State<SignUpForm> {
                   obscureText: _obscureConfirmPassword,
                   decoration: InputDecoration(
                     labelText: 'Confirmar Senha',
-                    hintText: '******',
                     prefixIcon: const Icon(Icons.lock),
                     suffixIcon: IconButton(
                       icon: Icon(

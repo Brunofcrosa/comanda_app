@@ -15,7 +15,7 @@ class ComandasApp extends StatelessWidget {
 
   static const Color primaryCustomColor = Color(0xFF1976D2);
   static const Color secondaryTextColor = Color(0xFF333333);
-  static const Color tertiaryGreyColor = Color(0xFFF5F5F5);
+  static const Color tertiaryGreyColor = Color.fromARGB(255, 221, 221, 221);
   static const Color successColor = Color(0xFF4CAF50);
   static const Color errorColor = Color(0xFFD32F2F);
 
