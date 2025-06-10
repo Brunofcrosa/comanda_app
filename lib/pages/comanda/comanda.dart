@@ -19,6 +19,7 @@ class _ComandaListPageState extends State<ComandaListPage> {
   final BancoDados _banco = BancoDados.instancia;
   List<Comanda> _comandas = [];
   bool _isLoading = true;
+  bool _hasError = false;
 
   @override
   void initState() {
@@ -27,9 +28,13 @@ class _ComandaListPageState extends State<ComandaListPage> {
   }
 
   Future<void> _carregarComandas() async {
+    if (!mounted) return;
+
     setState(() {
       _isLoading = true;
+      _hasError = false;
     });
+
     try {
       final comandas = await _banco.listarComandas();
       if (mounted) {
@@ -40,15 +45,17 @@ class _ComandaListPageState extends State<ComandaListPage> {
       }
     } catch (e) {
       if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _hasError = true;
+        });
         showSnackBarMessage(
           context,
-          'Erro ao carregar comandas: $e', // Corrigido: $e é uma interpolação válida
+          'Erro ao carregar comandas: ${e.toString()}',
           isError: true,
         );
       }
-      debugPrint(
-        'Erro ao carregar comandas: $e',
-      ); // Corrigido: $e é uma interpolação válida
+      debugPrint('Erro ao carregar comandas: $e');
     }
   }
 
@@ -70,7 +77,7 @@ class _ComandaListPageState extends State<ComandaListPage> {
         return AlertDialog(
           title: const Text('Confirmar Exclusão'),
           content: Text(
-            'Tem certeza que deseja remover a comanda "${comanda.nome}"?', // Corrigido: Interpolação com chaves para maior clareza
+            'Tem certeza que deseja remover a comanda "${comanda.nome}"?',
           ),
           actions: <Widget>[
             TextButton(
@@ -95,7 +102,7 @@ class _ComandaListPageState extends State<ComandaListPage> {
     );
 
     if (confirm == true) {
-      _removerComanda(comanda.id!);
+      await _removerComanda(comanda.id!);
     }
   }
 
@@ -110,13 +117,11 @@ class _ComandaListPageState extends State<ComandaListPage> {
       if (mounted) {
         showSnackBarMessage(
           context,
-          'Erro ao remover comanda: $e', // Corrigido: $e é uma interpolação válida
+          'Erro ao remover comanda: ${e.toString()}',
           isError: true,
         );
       }
-      debugPrint(
-        'Erro ao remover comanda: $e',
-      ); // Corrigido: $e é uma interpolação válida
+      debugPrint('Erro ao remover comanda: $e');
     }
   }
 
@@ -147,17 +152,48 @@ class _ComandaListPageState extends State<ComandaListPage> {
     );
   }
 
+  Widget _buildErrorState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline,
+              size: 100,
+              color: Theme.of(context).colorScheme.error,
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Ocorreu um erro ao carregar as comandas.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 18,
+                color: Theme.of(context).textTheme.bodyMedium?.color,
+              ),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _carregarComandas,
+              child: const Text('Tentar novamente'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildComandaItem(Comanda comanda, int index) {
     final dataFormatada = DateFormat(
       'dd/MM/yyyy HH:mm',
       'pt_BR',
     ).format(comanda.dataCriacao);
-    final totalFormatado = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$')
-        .format(
-          comanda.total,
-        ); // Apenas um '\' é necessário para escapar o '$' dentro de uma string literal
-    final String comandaTitle =
-        'Comanda ${index + 1}'; // Boa prática usar chaves para expressões
+    final totalFormatado = NumberFormat.currency(
+      locale: 'pt_BR',
+      symbol: 'R\$',
+    ).format(comanda.total);
+    final String comandaTitle = 'Comanda ${index + 1}';
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
@@ -170,119 +206,232 @@ class _ComandaListPageState extends State<ComandaListPage> {
           padding: const EdgeInsets.all(16.0),
           child: LayoutBuilder(
             builder: (context, constraints) {
-              return Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.receipt,
-                    size: 30,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    flex: 3,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          comandaTitle, // Usando a variável comandaTitle
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          comanda.nome,
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Theme.of(context).textTheme.bodyLarge?.color,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.calendar_today,
-                              size: 14,
-                              color: Theme.of(
-                                context,
-                              ).textTheme.bodySmall?.color,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              dataFormatada,
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Theme.of(
-                                  context,
-                                ).textTheme.bodySmall?.color,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Icon(
-                              Icons.list_alt,
-                              size: 14,
-                              color: Theme.of(
-                                context,
-                              ).textTheme.bodySmall?.color,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              '${comanda.itens.length} itens', // Interpolação com chaves para expressão
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Theme.of(
-                                  context,
-                                ).textTheme.bodySmall?.color,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        totalFormatado,
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: ComandasApp.primaryCustomColor,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 8),
-                      SizedBox(
-                        width: 38,
-                        height: 38,
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          icon: Icon(
-                            Icons.delete,
-                            color: ComandasApp.errorColor,
-                            size: 24,
-                          ),
-                          onPressed: () => _confirmarRemocaoComanda(comanda),
-                          tooltip: 'Remover Comanda',
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              );
+              final isSmallScreen = constraints.maxWidth < 400;
+
+              if (isSmallScreen) {
+                return _buildSmallComandaItem(
+                  comanda,
+                  comandaTitle,
+                  dataFormatada,
+                  totalFormatado,
+                );
+              } else {
+                return _buildLargeComandaItem(
+                  comanda,
+                  comandaTitle,
+                  dataFormatada,
+                  totalFormatado,
+                );
+              }
             },
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildSmallComandaItem(
+    Comanda comanda,
+    String title,
+    String data,
+    String total,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(
+              Icons.receipt,
+              size: 24,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            Text(
+              total,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: ComandasApp.primaryCustomColor,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Text(
+          comanda.nome,
+          style: TextStyle(
+            fontSize: 14,
+            color: Theme.of(context).textTheme.bodyLarge?.color,
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            Icon(
+              Icons.calendar_today,
+              size: 14,
+              color: Theme.of(context).textTheme.bodySmall?.color,
+            ),
+            const SizedBox(width: 4),
+            Text(
+              data,
+              style: TextStyle(
+                fontSize: 12,
+                color: Theme.of(context).textTheme.bodySmall?.color,
+              ),
+            ),
+            const Spacer(),
+            Icon(
+              Icons.list_alt,
+              size: 14,
+              color: Theme.of(context).textTheme.bodySmall?.color,
+            ),
+            const SizedBox(width: 4),
+            Text(
+              '${comanda.itens.length} itens',
+              style: TextStyle(
+                fontSize: 12,
+                color: Theme.of(context).textTheme.bodySmall?.color,
+              ),
+            ),
+            const SizedBox(width: 8),
+            IconButton(
+              icon: Icon(Icons.delete, color: ComandasApp.errorColor, size: 20),
+              onPressed: () => _confirmarRemocaoComanda(comanda),
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+              tooltip: 'Remover Comanda',
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLargeComandaItem(
+    Comanda comanda,
+    String title,
+    String data,
+    String total,
+  ) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Icon(
+          Icons.receipt,
+          size: 30,
+          color: Theme.of(context).colorScheme.primary,
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          flex: 3,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                comanda.nome,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Icon(
+                    Icons.calendar_today,
+                    size: 14,
+                    color: Theme.of(context).textTheme.bodySmall?.color,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    data,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Theme.of(context).textTheme.bodySmall?.color,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Icon(
+                    Icons.list_alt,
+                    size: 14,
+                    color: Theme.of(context).textTheme.bodySmall?.color,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    '${comanda.itens.length} itens',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Theme.of(context).textTheme.bodySmall?.color,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 10),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              total,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: ComandasApp.primaryCustomColor,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: 38,
+              height: 38,
+              child: IconButton(
+                padding: EdgeInsets.zero,
+                icon: Icon(
+                  Icons.delete,
+                  color: ComandasApp.errorColor,
+                  size: 24,
+                ),
+                onPressed: () => _confirmarRemocaoComanda(comanda),
+                tooltip: 'Remover Comanda',
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 
@@ -301,6 +450,8 @@ class _ComandaListPageState extends State<ComandaListPage> {
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
+          : _hasError
+          ? _buildErrorState()
           : _comandas.isEmpty
           ? _buildEmptyState()
           : RefreshIndicator(
