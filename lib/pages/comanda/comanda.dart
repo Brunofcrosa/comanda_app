@@ -1,4 +1,3 @@
-// lib/pages/comanda/comanda.dart
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_comandas_app/servicos/database/banco_dados.dart';
@@ -125,6 +124,24 @@ class _ComandaListPageState extends State<ComandaListPage> {
     }
   }
 
+  Future<void> _editarNomeComanda(Comanda comanda) async {
+    final String? newName = await showDialog<String?>(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return _EditComandaNameDialog(initialName: comanda.nome);
+      },
+    );
+
+    if (newName != null && newName.isNotEmpty && mounted) {
+      setState(() {
+        final index = _comandas.indexOf(comanda);
+        if (index != -1) {
+          _comandas[index].nome = newName;
+        }
+      });
+    }
+  }
+
   Widget _buildEmptyState() {
     return Center(
       child: Padding(
@@ -193,7 +210,7 @@ class _ComandaListPageState extends State<ComandaListPage> {
       locale: 'pt_BR',
       symbol: 'R\$',
     ).format(comanda.total);
-    final String comandaTitle = 'Comanda ${index + 1}';
+    final String comandaIdentifier = 'Comanda ${comanda.id ?? index + 1}';
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
@@ -211,14 +228,14 @@ class _ComandaListPageState extends State<ComandaListPage> {
               if (isSmallScreen) {
                 return _buildSmallComandaItem(
                   comanda,
-                  comandaTitle,
+                  comandaIdentifier,
                   dataFormatada,
                   totalFormatado,
                 );
               } else {
                 return _buildLargeComandaItem(
                   comanda,
-                  comandaTitle,
+                  comandaIdentifier,
                   dataFormatada,
                   totalFormatado,
                 );
@@ -232,7 +249,7 @@ class _ComandaListPageState extends State<ComandaListPage> {
 
   Widget _buildSmallComandaItem(
     Comanda comanda,
-    String title,
+    String comandaIdentifier,
     String data,
     String total,
   ) {
@@ -249,7 +266,7 @@ class _ComandaListPageState extends State<ComandaListPage> {
             const SizedBox(width: 8),
             Expanded(
               child: Text(
-                title,
+                comanda.nome,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
@@ -271,10 +288,10 @@ class _ComandaListPageState extends State<ComandaListPage> {
         ),
         const SizedBox(height: 8),
         Text(
-          comanda.nome,
+          comandaIdentifier,
           style: TextStyle(
             fontSize: 14,
-            color: Theme.of(context).textTheme.bodyLarge?.color,
+            color: Theme.of(context).textTheme.bodySmall?.color,
           ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
@@ -311,6 +328,13 @@ class _ComandaListPageState extends State<ComandaListPage> {
             ),
             const SizedBox(width: 8),
             IconButton(
+              icon: Icon(Icons.edit, color: Theme.of(context).colorScheme.secondary, size: 20),
+              onPressed: () => _editarNomeComanda(comanda),
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+              tooltip: 'Editar Nome da Comanda',
+            ),
+            IconButton(
               icon: Icon(Icons.delete, color: ComandasApp.errorColor, size: 20),
               onPressed: () => _confirmarRemocaoComanda(comanda),
               padding: EdgeInsets.zero,
@@ -325,7 +349,7 @@ class _ComandaListPageState extends State<ComandaListPage> {
 
   Widget _buildLargeComandaItem(
     Comanda comanda,
-    String title,
+    String comandaIdentifier,
     String data,
     String total,
   ) {
@@ -345,7 +369,7 @@ class _ComandaListPageState extends State<ComandaListPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                title,
+                comanda.nome,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
@@ -356,10 +380,10 @@ class _ComandaListPageState extends State<ComandaListPage> {
               ),
               const SizedBox(height: 4),
               Text(
-                comanda.nome,
+                comandaIdentifier,
                 style: TextStyle(
                   fontSize: 14,
-                  color: Theme.of(context).textTheme.bodyLarge?.color,
+                  color: Theme.of(context).textTheme.bodySmall?.color,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -415,19 +439,38 @@ class _ComandaListPageState extends State<ComandaListPage> {
               overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 8),
-            SizedBox(
-              width: 38,
-              height: 38,
-              child: IconButton(
-                padding: EdgeInsets.zero,
-                icon: Icon(
-                  Icons.delete,
-                  color: ComandasApp.errorColor,
-                  size: 24,
+            Row(
+              children: [
+                SizedBox(
+                  width: 38,
+                  height: 38,
+                  child: IconButton(
+                    padding: EdgeInsets.zero,
+                    icon: Icon(
+                      Icons.edit,
+                      color: Theme.of(context).colorScheme.secondary,
+                      size: 24,
+                    ),
+                    onPressed: () => _editarNomeComanda(comanda),
+                    tooltip: 'Editar Nome da Comanda',
+                  ),
                 ),
-                onPressed: () => _confirmarRemocaoComanda(comanda),
-                tooltip: 'Remover Comanda',
-              ),
+                const SizedBox(width: 8),
+                SizedBox(
+                  width: 38,
+                  height: 38,
+                  child: IconButton(
+                    padding: EdgeInsets.zero,
+                    icon: Icon(
+                      Icons.delete,
+                      color: ComandasApp.errorColor,
+                      size: 24,
+                    ),
+                    onPressed: () => _confirmarRemocaoComanda(comanda),
+                    tooltip: 'Remover Comanda',
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -451,19 +494,19 @@ class _ComandaListPageState extends State<ComandaListPage> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _hasError
-          ? _buildErrorState()
-          : _comandas.isEmpty
-          ? _buildEmptyState()
-          : RefreshIndicator(
-              onRefresh: _carregarComandas,
-              child: ListView.builder(
-                padding: const EdgeInsets.all(8.0),
-                itemCount: _comandas.length,
-                itemBuilder: (context, index) {
-                  return _buildComandaItem(_comandas[index], index);
-                },
-              ),
-            ),
+              ? _buildErrorState()
+              : _comandas.isEmpty
+                  ? _buildEmptyState()
+                  : RefreshIndicator(
+                      onRefresh: _carregarComandas,
+                      child: ListView.builder(
+                        padding: const EdgeInsets.all(8.0),
+                        itemCount: _comandas.length,
+                        itemBuilder: (context, index) {
+                          return _buildComandaItem(_comandas[index], index);
+                        },
+                      ),
+                    ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           await Navigator.push(
@@ -477,6 +520,72 @@ class _ComandaListPageState extends State<ComandaListPage> {
         tooltip: 'Adicionar Nova Comanda',
         child: const Icon(Icons.add),
       ),
+    );
+  }
+}
+
+class _EditComandaNameDialog extends StatefulWidget {
+  final String initialName;
+
+  const _EditComandaNameDialog({required this.initialName});
+
+  @override
+  _EditComandaNameDialogState createState() => _EditComandaNameDialogState();
+}
+
+class _EditComandaNameDialogState extends State<_EditComandaNameDialog> {
+  late TextEditingController _nomeController;
+
+  @override
+  void initState() {
+    super.initState();
+    _nomeController = TextEditingController(text: widget.initialName);
+  }
+
+  @override
+  void dispose() {
+    _nomeController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Editar Nome da Comanda'),
+      content: TextField(
+        controller: _nomeController,
+        decoration: const InputDecoration(
+          labelText: 'Novo Nome',
+        ),
+        autofocus: true,
+      ),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop(null); 
+          },
+          child: Text(
+            'Cancelar',
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+          ),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            if (_nomeController.text.trim().isEmpty) {
+              showSnackBarMessage(
+                context,
+                'O nome não pode ser vazio.',
+                isError: true,
+              );
+              return;
+            }
+            Navigator.of(context).pop(_nomeController.text.trim()); 
+          },
+          child: const Text('Salvar'),
+        ),
+      ],
     );
   }
 }

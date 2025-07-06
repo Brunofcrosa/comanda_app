@@ -436,8 +436,8 @@ class _ComprovantesPageState extends State<ComprovantesPage> {
             ),
           );
         },
-        child: const Icon(Icons.add_a_photo),
         tooltip: 'Adicionar Comprovante',
+        child: const Icon(Icons.add_a_photo),
       ),
     );
   }

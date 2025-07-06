@@ -28,11 +28,9 @@ class ComandasApp extends StatelessWidget {
         colorScheme: ColorScheme.light().copyWith(
           primary: primaryCustomColor,
           secondary: primaryCustomColor,
-          background: Colors.white,
           surface: Colors.white,
           onPrimary: Colors.white,
           onSecondary: Colors.white,
-          onBackground: secondaryTextColor,
           onSurface: secondaryTextColor,
           error: errorColor,
           onError: Colors.white,

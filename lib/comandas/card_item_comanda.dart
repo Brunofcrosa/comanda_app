@@ -109,7 +109,7 @@ class ComandaItemCard extends StatelessWidget {
       child: Container(
         width: 70,
         height: 70,
-        color: Theme.of(context).colorScheme.surfaceVariant,
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         child: imagePath != null && imagePath.isNotEmpty
             ? Image.file(
                 File(imagePath),

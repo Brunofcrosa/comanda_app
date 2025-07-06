@@ -108,7 +108,7 @@ class _AddItemFormState extends State<AddItemForm> {
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
                           height: 150,
-                          color: Theme.of(context).colorScheme.surfaceVariant,
+                          color: Theme.of(context).colorScheme.surfaceContainerHighest,
                           child: Icon(
                             Icons.broken_image,
                             size: 50,

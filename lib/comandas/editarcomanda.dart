@@ -109,75 +109,6 @@ class _EditarComandaPageState extends State<EditarComandaPage> {
     }
   }
 
-  Future<void> _showEditComandaNameModal() async {
-    final TextEditingController nameController = TextEditingController(
-      text: _editingComanda.nome,
-    );
-
-    try {
-      await showDialog<void>(
-        context: context,
-        builder: (BuildContext dialogContext) {
-          return AlertDialog(
-            title: const Text('Editar Nome da Comanda'),
-            content: TextFormField(
-              controller: nameController,
-              decoration: const InputDecoration(
-                labelText: 'Nome da Comanda',
-                hintText: 'Ex: Mesa 5',
-              ),
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return 'O nome da comanda não pode ser vazio.';
-                }
-                return null;
-              },
-            ),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () => Navigator.of(dialogContext).pop(),
-                child: Text(
-                  'Cancelar',
-                  style: TextStyle(
-                    color: Theme.of(dialogContext).colorScheme.onSurface,
-                  ),
-                ),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  final String newName = nameController.text.trim();
-                  if (newName.isEmpty) {
-                    if (mounted) {
-                      showSnackBarMessage(
-                        dialogContext,
-                        'O nome da comanda não pode ser vazio.',
-                        isError: true,
-                      );
-                    }
-                    return;
-                  }
-                  setState(() {
-                    _editingComanda = _editingComanda.copyWith(nome: newName);
-                  });
-                  if (mounted) {
-                    showSnackBarMessage(
-                      context,
-                      'Nome da comanda atualizado temporariamente. Salve para persistir.',
-                    );
-                  }
-                  Navigator.of(dialogContext).pop();
-                },
-                child: const Text('Salvar'),
-              ),
-            ],
-          );
-        },
-      );
-    } finally {
-      nameController.dispose();
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final totalFormatado = NumberFormat.currency(
@@ -186,15 +117,10 @@ class _EditarComandaPageState extends State<EditarComandaPage> {
     ).format(_editingComanda.total);
 
     return Scaffold(
-      backgroundColor: Color(0xFFFFFFFF),
+      backgroundColor: const Color(0xFFFFFFFF),
       appBar: AppBar(
         title: Text('Comanda: ${_editingComanda.nome}'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: _showEditComandaNameModal,
-            tooltip: 'Editar Nome da Comanda',
-          ),
           IconButton(
             icon: const Icon(Icons.done),
             onPressed: _isLoading ? null : _saveComandaChanges,
