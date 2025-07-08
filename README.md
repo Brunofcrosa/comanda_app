@@ -3,4 +3,4 @@ Um aplicativo de comanda simples e eficiente para gerenciar pedidos e mesas em e
 Demonstração
 Assista a uma demonstração do aplicativo em funcionamento no YouTube:
 
-Link: https://github.com/Brunofcrosa/comanda_app
+Link:  https://www.youtube.com/watch?v=8jjA6eFz0s4
